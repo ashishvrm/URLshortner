@@ -1,15 +1,26 @@
-import React from 'react';
-import type { ComponentType } from 'react';
+import React, { forwardRef } from 'react';
 
 interface ActionButtonProps {
   ariaLabel: string;
-  Icon: ComponentType<React.ComponentProps<'svg'>>;
+  Icon: React.ComponentType<React.SVGProps<SVGSVGElement>>;
+  onClick?: () => void;
 }
 
-const ActionButton: React.FC<ActionButtonProps> = ({ ariaLabel, Icon }) => (
-  <button aria-label={ariaLabel} className="p-2 bg-gray-100 rounded-full hover:bg-gray-200">
-    <Icon className="h-5 w-5" aria-hidden="true" />
-  </button>
+const ActionButton = forwardRef<HTMLButtonElement, ActionButtonProps>(
+  ({ ariaLabel, Icon, onClick }, ref) => {
+    return (
+      <button
+        ref={ref}
+        aria-label={ariaLabel}
+        className="p-2 text-gray-400 hover:text-gray-500"
+        onClick={onClick}
+      >
+        <Icon className="w-5 h-5" aria-hidden="true" />
+      </button>
+    );
+  }
 );
+
+ActionButton.displayName = 'ActionButton';
 
 export default ActionButton;
