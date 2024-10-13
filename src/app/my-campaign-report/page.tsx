@@ -1,8 +1,8 @@
 'use client';
 
 import React, { useState } from 'react';
-import CampaignList from '@/components/CampaignList';
-import CampaignDetails from '@/components/CampaignDetails';
+import CampaignList from '@/components/campaign/CampaignList';
+import CampaignDetails from '@/components/campaign/CampaignDetails';
 import { Campaign } from '@/types/Campaign';
 
 // Mock data for campaigns

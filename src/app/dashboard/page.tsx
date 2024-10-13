@@ -1,10 +1,10 @@
 'use client';
 
-import Card from '@/components/Card';
+import Card from '@/components/common/Card';
 import React, { useState } from 'react';
-import CommonTable from '@/components/CommonTable';
+import CommonTable from '@/components/common/CommonTable';
 import LiveStat from '@/components/LiveStat';
-import Modal from '@/components/Modal';
+import Modal from '@/components/common/Modal';
 import DatePicker from 'react-datepicker';
 import 'react-datepicker/dist/react-datepicker.css';
 
