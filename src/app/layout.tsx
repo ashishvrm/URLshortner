@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import localFont from "next/font/local";
 import "./globals.scss";
 import Navigation from '@/components/common/Navigation';
+import FirebaseInitializer from '@/components/FirebaseInitializer';
 
 const geistSans = localFont({
   src: "./fonts/GeistVF.woff",
@@ -29,6 +30,7 @@ export default function RootLayout({
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
+        <FirebaseInitializer />
         <div className="flex">
           <Navigation />
           <main className="flex-1 ml-16">{children}</main>

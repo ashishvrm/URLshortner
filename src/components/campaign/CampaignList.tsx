@@ -1,11 +1,11 @@
 import React from 'react';
 import Link from 'next/link';
-import { Campaign } from '@/types/Campaign';
+import { CampaignData } from '@/services/firebase';
 
 interface CampaignListProps {
-  campaigns: Campaign[];
-  selectedCampaign: number | null;
-  onSelectCampaign: (id: number) => void;
+  campaigns: CampaignData[];
+  selectedCampaign: string | null;
+  onSelectCampaign: (id: string) => void;
 }
 
 const CampaignList: React.FC<CampaignListProps> = ({ campaigns, selectedCampaign, onSelectCampaign }) => (
@@ -21,10 +21,7 @@ const CampaignList: React.FC<CampaignListProps> = ({ campaigns, selectedCampaign
                 ? 'bg-red-200 text-red-900'
                 : 'hover:bg-red-100'
             }`}
-            onClick={(e) => {
-              e.preventDefault();
-              onSelectCampaign(campaign.id);
-            }}
+            onClick={() => onSelectCampaign(campaign.id)}
           >
             {campaign.name}
           </Link>
@@ -35,4 +32,3 @@ const CampaignList: React.FC<CampaignListProps> = ({ campaigns, selectedCampaign
 );
 
 export default CampaignList;
-

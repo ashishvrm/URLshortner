@@ -1,3 +1,5 @@
+'use client';
+
 import React, { useState } from 'react';
 import { ClipboardDocumentIcon, QrCodeIcon } from '@heroicons/react/24/outline';
 import QRCodeModal from './QRCodeModal';

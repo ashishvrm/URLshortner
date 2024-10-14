@@ -1,44 +1,62 @@
 'use client';
 
 import Card from '@/components/common/Card';
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import CommonTable from '@/components/common/CommonTable';
 import LiveStat from '@/components/LiveStat';
 import Modal from '@/components/common/Modal';
 import DatePicker from 'react-datepicker';
 import 'react-datepicker/dist/react-datepicker.css';
+import { getCampaigns, CampaignData } from '@/services/firebase';
+
+// Add backgroundColor to CampaignData interface
+interface ExtendedCampaignData extends CampaignData {
+  backgroundColor?: string;
+}
 
 const DashboardPage = () => {
+  const [campaigns, setCampaigns] = useState<ExtendedCampaignData[]>([]);
   const [isOpen, setIsOpen] = useState(false);
   const [startDate, setStartDate] = useState(new Date());
   const [endDate, setEndDate] = useState(new Date());
   const [description, setDescription] = useState('');
+  const [campaignName, setCampaignName] = useState('');
+  const [campaignType, setCampaignType] = useState('');
+
+  useEffect(() => {
+    const fetchCampaigns = async () => {
+      try {
+        const campaignData = await getCampaigns();
+        setCampaigns(campaignData);
+      } catch (err) {
+        console.error('Error fetching campaigns:', err);
+      }
+    };
+
+    fetchCampaigns();
+  }, []);
 
   const cardData = [
-    { title: "Total Campaigns", count: 10 },
-    { title: "Currently Running", count: 5 },
-    { title: "Disabled", count: 3 },
-    { title: "Draft", count: 2 },
+    { title: "Total Campaigns", count: campaigns.length },
+    { title: "Currently Running", count: campaigns.filter(c => c.status === 'Running').length },
+    { title: "Disabled", count: campaigns.filter(c => c.status === 'Disabled').length },
+    { title: "Draft", count: campaigns.filter(c => c.status === 'Draft').length },
   ];
 
-  const liveStatsData = [
-    { name: 'Impressions', value: 1000 },
-    { name: 'Clicks', value: 500 },
-    { name: 'Conversions', value: 200 },
-  ];
+  const liveStatsData = campaigns.filter(c => c.status === 'Running').slice(0, 3).map(campaign => ({
+    ...campaign,
+    backgroundColor: campaign.backgroundColor || '#default-color' // Provide a default color if not set
+  }));
 
-  const data = [
-    { id: '1', campaign: 'Sweepstakes', status: 'Running', line: 'Line 1', type: 'Type 1', referral: 'Referral 1', earning: 100 },
-    { id: '2', campaign: 'Email Newsletter', status: 'Draft', line: 'Line 2', type: 'Type 2', referral: 'Referral 2', earning: 200 },
-    { id: '3', campaign: 'Facebook Ads', status: 'Disabled', line: 'Line 3', type: 'Type 3', referral: 'Referral 3', earning: 300 },
-    { id: '4', campaign: 'Google Ads', status: 'Running', line: 'Line 4', type: 'Type 4', referral: 'Referral 4', earning: 400 },
-  ];
-
-  const liveStats = [
-    { campaignName: 'Sweepstakes', backgroundColor: 'bg-blue-100' },
-    { campaignName: 'Email Newsletter', backgroundColor: 'bg-green-100' },
-    { campaignName: 'Facebook Ads', backgroundColor: 'bg-yellow-100' },
-  ];
+  const tableData = campaigns.map(campaign => ({
+    id: campaign.id,
+    campaign: campaign.name,
+    status: campaign.status,
+    line: campaign.type,
+    type: campaign.type,
+    referral: 'N/A', // Add this field to your CampaignData if available
+    earning: 0, // Add this field to your CampaignData if available
+  }));
 
   const handleNewCampaign = () => {
     // Handle campaign creation here
@@ -61,12 +79,7 @@ const DashboardPage = () => {
               <path fillRule="evenodd" d="M10 5a1 1 0 011 1v3h3a1 1 0 110 2h-3v3a1 1 0 11-2 0v-3H6a1 1 0 110-2h3V6a1 1 0 011-1z" clipRule="evenodd" />
             </svg>
           </button>
-          <a
-            href="/MyCampaign"
-            className="bg-white text-black border border-black px-4 py-2 rounded-full transition duration-300 flex items-center hover:bg-gray-100"
-          >
-            My Campaigns
-          </a>
+          
         </div>
       </div>
 
@@ -75,6 +88,16 @@ const DashboardPage = () => {
         onClose={() => setIsOpen(false)}
         title="Create a new campaign"
       >
+        <div className="mb-4">
+          <label className="block mb-1">Campaign Name</label>
+          <input
+            type="text"
+            value={campaignName}
+            onChange={(e) => setCampaignName(e.target.value)}
+            className="w-full border rounded p-2"
+            placeholder="Enter campaign name"
+          />
+        </div>
         <div className="flex gap-4 mb-4">
           <div className="relative">
             <label className="block mb-1">Start Date</label>
@@ -104,6 +127,22 @@ const DashboardPage = () => {
           </div>
         </div>
         <div className="mb-4">
+          <label className="block mb-1">Campaign Type</label>
+          <select
+            value={campaignType}
+            onChange={(e) => setCampaignType(e.target.value)}
+            className="w-full border rounded p-2"
+          >
+            <option value="">Select campaign type</option>
+            <option value="Google CPC">Google CPC</option>
+            <option value="Google Organic">Google Organic</option>
+            <option value="Facebook Ads">Facebook Ads</option>
+            <option value="Newsletter">Newsletter</option>
+            <option value="Agent direct promotion">Agent direct promotion</option>
+            <option value="Display ads">Display ads</option>
+          </select>
+        </div>
+        <div className="mb-4">
           <label className="block mb-1">Description / Details</label>
           <textarea
             value={description}
@@ -121,7 +160,18 @@ const DashboardPage = () => {
       </Modal>
 
       <div className="mt-4">
-        <h2 className="text-xl font-semibold mb-4">Campaigns Stats</h2>
+        <div className="flex justify-between items-center mb-4">
+          <h2 className="text-xl font-semibold">Campaigns Stats</h2>
+          <a
+            href="/MyCampaign"
+            className="bg-white text-black px-4 py-2 rounded-full transition duration-300 flex items-center hover:bg-gray-100"
+          >
+            My Campaigns
+            <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 ml-2" viewBox="0 0 20 20" fill="currentColor">
+              <path fillRule="evenodd" d="M10.293 3.293a1 1 0 011.414 0l6 6a1 1 0 010 1.414l-6 6a1 1 0 01-1.414-1.414L14.586 11H3a1 1 0 110-2h11.586l-4.293-4.293a1 1 0 010-1.414z" clipRule="evenodd" />
+            </svg>
+          </a>
+        </div>
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
           {cardData.map((card, index) => (
             <Card key={index} title={card.title} count={card.count} />
@@ -131,10 +181,10 @@ const DashboardPage = () => {
       <div className="mt-4">
         <h2 className="text-xl font-semibold mb-4">Live Stats</h2>
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-          {liveStats.map((stat, index) => (
+          {liveStatsData.map((stat, index) => (
             <LiveStat
               key={index}
-              campaignName={stat.campaignName}
+              campaignName={stat.name}
               backgroundColor={stat.backgroundColor}
               //onLinkClick={() => console.log(`Clicked link for ${stat.campaignName}`)}
             />
@@ -142,7 +192,7 @@ const DashboardPage = () => {
         </div>
       </div>
       
-      <CommonTable data={data} className="mt-4" />
+      <CommonTable data={tableData} className="mt-4" />
     </div>
   );
 };

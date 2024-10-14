@@ -27,16 +27,16 @@ interface VisitorData {
 }
 
 interface StatisticsChartProps {
-  data: VisitorData[];
+  statistics: VisitorData[];
 }
 
-const StatisticsChart: React.FC<StatisticsChartProps> = ({ data }) => {
+const StatisticsChart: React.FC<StatisticsChartProps> = ({ statistics }) => {
   const chartData = {
-    labels: data.map(item => item.month),
+    labels: statistics.map(item => item.month),
     datasets: [
       {
         label: 'Number of Visitors',
-        data: data.map(item => item.visitors),
+        data: statistics.map(item => item.visitors),
         borderColor: 'rgb(75, 192, 192)',
         tension: 0.1,
       },
@@ -75,4 +75,3 @@ const StatisticsChart: React.FC<StatisticsChartProps> = ({ data }) => {
 };
 
 export default StatisticsChart;
-

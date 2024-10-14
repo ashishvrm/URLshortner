@@ -1,5 +1,7 @@
+'use client';
+
 import React, { useState } from 'react';
-import { Campaign } from '@/types/Campaign';
+import { CampaignData } from '@/services/firebase';
 import UrlInput from './UrlInput';
 import ActionButton from './IconAction';
 import { ArrowDownTrayIcon, ShareIcon, EnvelopeIcon, ChatBubbleLeftRightIcon, PrinterIcon } from '@heroicons/react/24/outline';
@@ -8,12 +10,10 @@ import { Popover } from '@headlessui/react';
 import { QRCodeSVG } from 'qrcode.react';
 
 interface CampaignDetailsProps {
-  campaign: Campaign | undefined;
+  campaign: CampaignData;
 }
 
 const CampaignDetails: React.FC<CampaignDetailsProps> = ({ campaign }) => {
-  if (!campaign) return null;
-
   const shortcampaignUrl = `https://www.websitename.com/r/sweepstakes=${campaign.id}`;
   const fullcampaignUrl = `https://www.websitename.com/sweepstakes?utm_source=email&utm_medium=advertisement&campaign=${campaign.id}`;
 
